@@ -15,7 +15,7 @@ A linguagem escolhida por mim para o projeto foi **Python** com o framework [Dja
 
 ## Estado atual do projeto
 
-- Apenas um esqueleto inicial, com a criação da Database, dos Models básicos e o acesso a *home page*.
+- GET, POST, PUT e PATCH de Profiles (tutores) e Pets implementados
 
 </div>
 
