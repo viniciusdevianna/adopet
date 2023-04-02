@@ -13,11 +13,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Loading environmental variables
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Loading environmental variables
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pet.apps.PetConfig',
-    'user.apps.UserConfig',
+    'rest_framework',
+    'pets.apps.PetsConfig',
 ]
 
 MIDDLEWARE = [
@@ -107,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'pets.Profile'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
