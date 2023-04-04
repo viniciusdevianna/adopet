@@ -1,15 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
 from .managers import CustomUserManager
 
-class Profile(AbstractUser):
-    IS_TUTOR = [
-        (0, 'Não'),
-        (1, 'Sim')
-    ]
-
-    STATES = [
+STATES = [
         ('AC', 'Acre'),
         ('AL', 'Alagoas'),
         ('AP', 'Amapá'),
@@ -39,12 +34,14 @@ class Profile(AbstractUser):
         ('TO', 'Tocantins')
     ]
 
+class Profile(AbstractUser):
+
     email = models.EmailField(_('email address'), unique=True)
     phone = models.CharField(max_length=12, blank=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=2, choices=STATES, default='RJ')
     about = models.CharField(max_length=480, blank=True)
-    is_tutor = models.IntegerField(choices=IS_TUTOR, default=0)
+    is_tutor = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = ['email']
 
@@ -52,6 +49,20 @@ class Profile(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+class Shelter(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    shelter_name = models.CharField(max_length=150)
+    shelter_city = models.CharField(max_length=100)
+    shelter_state = models.CharField(max_length=2, choices=STATES, default='RJ')
+    shelter_address = models.CharField(max_length=240, blank=True)
+    shelter_about = models.CharField(max_length=480, blank=True)
+
+    date_registered = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.shelter_name
+
     
 class Pet(models.Model):
     
@@ -85,8 +96,28 @@ class Pet(models.Model):
     first_trait = models.CharField(max_length=3, default='ACT', choices=Traits.choices, blank=True)
     second_trait = models.CharField(max_length=3, default='ACT', choices=Traits.choices, blank=True)
 
-    tutor = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(Profile, on_delete=models.DO_NOTHING, null=True)
+    shelter = models.ForeignKey(Shelter, on_delete=models.DO_NOTHING, null=True)
+    
+    adopted = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
+    
+class Adoption(models.Model):
+    STATUS = [
+        ('A', 'Em andamento'),
+        ('R', 'Realizada'),
+        ('C', 'Cancelada')
+    ]
+
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    date_registered = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=1, choices=STATUS, default='A')
+    date_finished = models.DateTimeField(default=now, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f'Adoção de {self.pet} por {self.tutor}'
+
 

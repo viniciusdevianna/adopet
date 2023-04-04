@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import ProfileCreationForm, ProfileChangeForm
-from .models import Profile, Pet
+from .models import Profile, Pet, Shelter, Adoption
 
 class ProfileAdmin(UserAdmin):
     add_form = ProfileCreationForm
@@ -18,13 +18,31 @@ class ProfileAdmin(UserAdmin):
     )
 
 class PetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'species', 'age', 'size', 'tutor')
-    list_display_links = ('id', 'name', 'tutor')
-    search_fields = ('name', 'tutor')
+    list_display = ('id', 'name', 'species', 'age', 'size', 'shelter', 'tutor')
+    list_display_links = ('id', 'name')
+    search_fields = ('name', 'shelter', 'tutor')
     list_per_page = 15
     list_filter = ('species', 'size')
 
+class ShelterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'shelter_name', 'shelter_state', 'profile', 'date_registered')
+    list_display_links = ('id', 'shelter_name')
+    search_fields = ('shelter_name', 'profile')
+    list_per_page = 15
+    list_filter = ('shelter_state', 'date_registered')
+
+class AdoptionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'pet', 'pet_shelter', 'tutor', 'date_registered', 'status')
+    list_display_links = ('id',)
+    search_fields = ('pet', 'pet_shelter', 'tutor')
+    list_per_page = 15
+    list_filter = ('status', 'date_registered')
+
+    @admin.display()
+    def pet_shelter(self, obj):
+        return obj.pet.shelter.shelter_name
 
 admin.site.register(Pet, PetAdmin)
 admin.site.register(Profile, ProfileAdmin)
-
+admin.site.register(Shelter, ShelterAdmin)
+admin.site.register(Adoption, AdoptionAdmin)

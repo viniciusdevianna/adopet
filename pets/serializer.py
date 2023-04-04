@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Pet, Profile
+from rest_framework.validators import ValidationError
+from .models import Pet, Profile, Shelter, Adoption
 
 class PetSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField()
@@ -7,6 +8,7 @@ class PetSerializer(serializers.ModelSerializer):
     first_trait = serializers.SerializerMethodField()
     second_trait = serializers.SerializerMethodField()
     tutor = serializers.ReadOnlyField(source='tutor.username')
+    shelter = serializers.ReadOnlyField(source='shelter.shelter_name')
 
     def get_species(self, object):
         return object.get_species_display()
@@ -26,6 +28,7 @@ class ListTutorPetsSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
     first_trait = serializers.SerializerMethodField()
     second_trait = serializers.SerializerMethodField()
+    shelter = serializers.ReadOnlyField(source="shelter.shelter_name")
 
     def get_species(self, object):
         return object.get_species_display()
@@ -40,7 +43,24 @@ class ListTutorPetsSerializer(serializers.ModelSerializer):
         model = Pet
         exclude = ['tutor',]
 
+class ListShelterPetsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pet
+        exclude = ['shelter', 'tutor']
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['id', 'username', 'email', 'phone', 'city', 'state', 'about', 'is_tutor']
+
+class ShelterSerializer(serializers.ModelSerializer):
+    profile = serializers.ReadOnlyField(source='profile.username')
+
+    class Meta:
+        model = Shelter
+        fields = '__all__'
+
+class AdoptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Adoption
+        fields = '__all__'
