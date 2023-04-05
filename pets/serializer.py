@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 from .models import Pet, Profile, Shelter, Adoption
+from .validators import *
 
 class PetSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField()
@@ -49,6 +50,11 @@ class ListShelterPetsSerializer(serializers.ModelSerializer):
         exclude = ['shelter', 'tutor']
 
 class ProfileSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if not phone_is_valid(data['phone']):
+            raise ValidationError({'phone': 'O telefone deve estar no formato (XX)XXX-XXX-XXX'})
+        return data
+    
     class Meta:
         model = Profile
         fields = ['id', 'username', 'email', 'phone', 'city', 'state', 'about', 'is_tutor']

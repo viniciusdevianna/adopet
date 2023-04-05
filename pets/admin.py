@@ -23,6 +23,7 @@ class PetAdmin(admin.ModelAdmin):
     search_fields = ('name', 'shelter', 'tutor')
     list_per_page = 15
     list_filter = ('species', 'size')
+    ordering = ('name',)
 
 class ShelterAdmin(admin.ModelAdmin):
     list_display = ('id', 'shelter_name', 'shelter_state', 'profile', 'date_registered')
@@ -30,6 +31,7 @@ class ShelterAdmin(admin.ModelAdmin):
     search_fields = ('shelter_name', 'profile')
     list_per_page = 15
     list_filter = ('shelter_state', 'date_registered')
+    ordering = ('shelter_name',)
 
 class AdoptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'pet', 'pet_shelter', 'tutor', 'date_registered', 'status')

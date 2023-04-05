@@ -1,13 +1,18 @@
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, filters
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 from .serializer import *
 from .models import Pet, Profile, Shelter, Adoption
 
 class PetsViewSet(viewsets.ModelViewSet):
     """Show all available pets"""
     queryset = Pet.objects.all()
-    serializer_class = PetSerializer    
+    serializer_class = PetSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['name',]
+    search_fields = ['name',]
+    filterset_fields = ['species',]
 
 class ProfilesViewSet(viewsets.ModelViewSet):
     """Show all tutors registered"""
@@ -17,6 +22,10 @@ class ProfilesViewSet(viewsets.ModelViewSet):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['username',]
+    search_fields = ['username', 'email']
+    filterset_fields = ['state',]
 
 class SheltersViewSet(viewsets.ModelViewSet):
     """Show all shelters registered"""
@@ -25,6 +34,8 @@ class SheltersViewSet(viewsets.ModelViewSet):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ShelterSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['shelter_name',]
 
 class AdoptionsViewSet(viewsets.ModelViewSet):
     """Show all current registered adoptions"""
@@ -48,6 +59,8 @@ class ListTutorPets(generics.ListAPIView):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ListTutorPetsSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['name',]
 
 
 class ListShelterPets(generics.ListAPIView):
@@ -58,3 +71,5 @@ class ListShelterPets(generics.ListAPIView):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ListShelterPetsSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['shelter_name',]

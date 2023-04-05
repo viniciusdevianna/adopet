@@ -37,7 +37,7 @@ STATES = [
 class Profile(AbstractUser):
 
     email = models.EmailField(_('email address'), unique=True)
-    phone = models.CharField(max_length=12, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=2, choices=STATES, default='RJ')
     about = models.CharField(max_length=480, blank=True)
