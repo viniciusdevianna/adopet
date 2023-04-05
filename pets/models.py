@@ -34,6 +34,12 @@ STATES = [
         ('TO', 'Tocantins')
     ]
 
+# Utility functions
+
+def pet_img_directory_path(instance, filename):
+        cleaned_shelter_name = instance.shelter.shelter_name.replace(" ", "_").lower()
+        return f'pets/{cleaned_shelter_name}/{filename}'
+
 class Profile(AbstractUser):
 
     email = models.EmailField(_('email address'), unique=True)
@@ -95,6 +101,7 @@ class Pet(models.Model):
     size = models.CharField(max_length=3, default='MIN', choices=Sizes.choices)
     first_trait = models.CharField(max_length=3, default='ACT', choices=Traits.choices, blank=True)
     second_trait = models.CharField(max_length=3, default='ACT', choices=Traits.choices, blank=True)
+    image = models.ImageField(upload_to=pet_img_directory_path, default='not_found.jpg')
 
     tutor = models.ForeignKey(Profile, on_delete=models.DO_NOTHING, null=True)
     shelter = models.ForeignKey(Shelter, on_delete=models.DO_NOTHING, null=True)
@@ -103,6 +110,9 @@ class Pet(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    def update_adoption_status(self):
+        self.adopted = not self.adopted
     
 class Adoption(models.Model):
     STATUS = [

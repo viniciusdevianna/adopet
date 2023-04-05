@@ -7,7 +7,9 @@ from .models import Pet, Profile, Shelter, Adoption
 
 class PetsViewSet(viewsets.ModelViewSet):
     """Show all available pets"""
-    queryset = Pet.objects.all()
+    def get_queryset(self):
+        return Pet.objects.filter(adopted=False)
+    
     serializer_class = PetSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['name',]
@@ -45,9 +47,20 @@ class AdoptionsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_destroy(self, instance):
-        if self.request.user != instance.pet.shelter.profile:
-            raise ValidationError("Apenas o abrigo pode cancelar uma adoção")
+        if not self.request.user.is_superuser:
+            raise ValidationError("Apenas o admin pode deletar uma adoção")
         instance.delete()
+
+    def perform_update(self, serializer):
+        if serializer.validated_data['status'] == 'R':
+            adopted_pet_id = serializer.validated_data['pet'].id
+            update_pet_adoption_status(adopted_pet_id)
+
+        if serializer.validated_data['status'] == 'C':
+            if self.request.user != serializer.validated_data['pet'].shelter.profile:
+                raise ValidationError("Apenas o abrigo responsável pode cancelar uma adoção")
+        
+        serializer.save()
 
     serializer_class = AdoptionSerializer
 
@@ -73,3 +86,10 @@ class ListShelterPets(generics.ListAPIView):
     serializer_class = ListShelterPetsSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['shelter_name',]
+
+# Utility functions
+
+def update_pet_adoption_status(pet_id):
+    pet = Pet.objects.get(pk=pet_id)
+    pet.update_adoption_status()
+    pet.save()

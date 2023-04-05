@@ -3,23 +3,7 @@ from rest_framework.validators import ValidationError
 from .models import Pet, Profile, Shelter, Adoption
 from .validators import *
 
-class PetSerializer(serializers.ModelSerializer):
-    species = serializers.SerializerMethodField()
-    size = serializers.SerializerMethodField()
-    first_trait = serializers.SerializerMethodField()
-    second_trait = serializers.SerializerMethodField()
-    tutor = serializers.ReadOnlyField(source='tutor.username')
-    shelter = serializers.ReadOnlyField(source='shelter.shelter_name')
-
-    def get_species(self, object):
-        return object.get_species_display()
-    def get_size(self, object):
-        return object.get_size_display()
-    def get_first_trait(self, object):
-        return object.get_first_trait_display()
-    def get_second_trait(self, object):
-        return object.get_second_trait_display()
-    
+class PetSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Pet
         fields = '__all__'
